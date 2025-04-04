@@ -33,7 +33,6 @@ function App() {
     return index === state.return.length - 1 ? "font-bold" : ""
   }, [state.return.length]);
   
-  
   useEffect(() => {
     const inputs = $('[data-mask="money"]')
     
@@ -61,11 +60,7 @@ function App() {
   
   const handleChange = useCallback((e) => {
     const {id, value} = e.target;
-    
-    setState((prev) => ({
-      ...prev,
-      [id]: value,
-    }));
+    setState((prev) => ({...prev, [id]: value,}));
   }, []);
   
   const formFields = useMemo(() => [
@@ -103,15 +98,20 @@ function App() {
         setState((prev) => ({...prev, ["return"]: calc.calcularProlabore()}))
       }
       
-      if (salary < minSalary.current) alert(`O pró-labore deve ser, de no mínimo de um salário mínimo, atualmente ${new Intl.NumberFormat('pt-BR', {style: "currency", currency: "BRL", maximumFractionDigits: 2}).format(minSalary.current)}. O resultado será calculado, mas use com cautela.`)
+      if (salary < minSalary.current) alert(`O pró-labore deve ser, de no mínimo de um salário mínimo, atualmente ${new Intl.NumberFormat('pt-BR', {
+        style: "currency",
+        currency: "BRL",
+        maximumFractionDigits: 2
+      }).format(minSalary.current)}. O resultado será calculado, mas use com cautela.`)
     }
   }
   
   return (
     <main
-      className="flex flex-col items-center justify-center min-h-svh bg-zinc-950 [&_*]:text-[16px] [&_*]:tracking-[0.5px]">
+      className="flex flex-col items-center justify-center min-h-svh bg-zinc-950 [&_*]:tracking-[0.5px]">
       <div className="px-4 md:px-40 lg:px-60 w-full">
-        <section className={"xl:px-20 2xl:px-80"}>
+        <section className={"xl:px-20 2xl:px-80 my-16"}>
+          <h1 className={"text-2xl font-medium p-0 mb-8 text-center"}>Calcular Pró-labore</h1>
           <form className="flex flex-col gap-4 flex-wrap">
             <fieldset className="grid grid-cols-2 auto-rows-auto max-w-[768px]:grid-cols-1 flex-col gap-4 flex-wrap">
               {
@@ -141,7 +141,8 @@ function App() {
                 ))
               }
             </fieldset>
-            <Button type={"submit"} className={"focus:outline-accent-foreground"} onClick={handleSubmit}>Calcular</Button>
+            <Button type={"submit"} className={"focus:outline-accent-foreground text-[16px]"}
+                    onClick={handleSubmit}>Calcular</Button>
           </form>
           
           {
