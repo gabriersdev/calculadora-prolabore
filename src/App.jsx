@@ -5,17 +5,19 @@ import {
   TableBody,
   TableCaption,
   TableCell,
-  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
 } from "./components/ui/table"
 
-import {useCallback, useEffect, useMemo, useState} from "react";
+import config from "./data/config.js";
+import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 
 import $ from 'jquery';
 import 'jquery-mask-plugin/dist/jquery.mask.min';
 import Calculator from "./classes/Calculator.js";
+import PrintProlabore from "./components/PrintProlabore.jsx";
+import FormGroup from "./components/FormGroup.jsx";
 
 function App() {
   const [state, setState] = useState({
@@ -24,9 +26,13 @@ function App() {
     "return": []
   });
   
+  const minSalary = useRef(config["min-salary"]);
+  const inputValue = useRef(null);
+  
   const formatCondition = useCallback((index) => {
     return index === state.return.length - 1 ? "font-bold" : ""
   }, [state.return.length]);
+  
   
   useEffect(() => {
     const inputs = $('[data-mask="money"]')
@@ -44,6 +50,8 @@ function App() {
         }))
       })
     })
+    
+    if (inputValue.current && !inputValue.current.isFocused) inputValue.current.focus();
     
     return () => {
       inputs.unmask();
@@ -67,19 +75,27 @@ function App() {
       placeholder: "R$ 0,00",
       label: "Valor do pró-labore",
       mask: "money",
-      options: {autoFocus: true}
+      options: {autoFocus: true, required: true, ref: inputValue},
     },
-    {type: "number", id: "count-depends", placeholder: "0", label: "Número de dependentes"},
+    {
+      type: "number",
+      id: "count-depends",
+      placeholder: "0",
+      label: "Número de dependentes"
+    },
   ], []);
   
   const handleSubmit = (e) => {
-    e.preventDefault()
-    
-    if (!state.value.trim() || !state["count-depends"].trim()) {
-      alert("Preencha todos os campos!")
+    if (!state.value.trim()) {
+      inputValue.current.setCustomValidity("É necessário informar o valor!");
+    } else if (!state["count-depends"].trim()) {
+      alert("Preencha todos os campos!");
     } else {
+      inputValue.current.setCustomValidity("");
+      e.preventDefault()
+      
       const salary = state.value.trim().replace(/[\sA-Z]*/gi, "").replace(/\./g, "").replace(/,/g, ".")
-
+      
       if (isNaN(parseFloat(salary)) || salary.startsWith("e") || salary.endsWith("e")) alert("Informe o valor do pró-labore corretamente!")
       else {
         const calc = new Calculator()
@@ -87,7 +103,7 @@ function App() {
         setState((prev) => ({...prev, ["return"]: calc.calcularProlabore()}))
       }
       
-      if (salary < 1518) alert("O pró-labore deve ser, de no mínimo de um salário mínimo, atualmente R$ 1.518,00. O resultado será calculado, mas use com cautela.")
+      if (salary < minSalary.current) alert(`O pró-labore deve ser, de no mínimo de um salário mínimo, atualmente ${new Intl.NumberFormat('pt-BR', {style: "currency", currency: "BRL", maximumFractionDigits: 2}).format(minSalary.current)}. O resultado será calculado, mas use com cautela.`)
     }
   }
   
@@ -97,27 +113,35 @@ function App() {
       <div className="px-4 md:px-40 lg:px-60 w-full">
         <section className={"xl:px-20 2xl:px-80"}>
           <form className="flex flex-col gap-4 flex-wrap">
-            {
-              formFields.map(({id, label, type, placeholder, mask, options = {}}) => (
-                <div className="flex gap-1 flex-col" key={id}>
-                  <label className="text-zinc-400" htmlFor={id}>
-                    {label}
-                  </label>
-                  <Input
-                    type={type}
-                    placeholder={placeholder}
-                    className="border-zinc-700 focus:border-zinc-500 text-gray-300 placeholder:text-zinc-400"
-                    id={id}
-                    required
-                    value={state[id] ?? ""}
-                    onChange={handleChange}
-                    data-mask={mask ?? ""}
-                    {...options}
-                  />
-                </div>
-              ))
-            }
-            <Button className={"focus:outline-accent-foreground"} onClick={handleSubmit}>Calcular</Button>
+            <fieldset className="grid grid-cols-2 auto-rows-auto max-w-[768px]:grid-cols-1 flex-col gap-4 flex-wrap">
+              {
+                formFields.filter(f => f.mask).map(({id, type, label, placeholder, mask, options}) => (
+                  <div className="flex gap-1 flex-col" key={id}>
+                    <label className="text-zinc-400" htmlFor={id}>
+                      {label}
+                    </label>
+                    <Input
+                      type={type}
+                      placeholder={placeholder}
+                      className="border-zinc-700 focus:border-zinc-500 text-gray-300 placeholder:text-zinc-400"
+                      id={id}
+                      required
+                      value={state[id] ?? ""}
+                      onChange={handleChange}
+                      autoComplete="off"
+                      data-mask={mask ?? ""}
+                      {...options}
+                    />
+                  </div>
+                ))
+              }
+              {
+                formFields.filter(f => !f.mask).map(form => (
+                  <FormGroup params={form} state={state} handleChange={handleChange} key={form.id}/>
+                ))
+              }
+            </fieldset>
+            <Button type={"submit"} className={"focus:outline-accent-foreground"} onClick={handleSubmit}>Calcular</Button>
           </form>
           
           {
@@ -161,7 +185,8 @@ function App() {
                     }
                   </TableBody>
                 </Table>
-              
+                
+                <PrintProlabore/>
               </div>
             ) : ""
           }

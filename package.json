@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@headlessui/react": "^2.2.0",
+    "@radix-ui/react-dropdown-menu": "^2.1.6",
     "@radix-ui/react-slot": "^1.1.2",
     "@tailwindcss/postcss": "^4.1.0",
     "@tailwindcss/vite": "^4.1.0",
@@ -22,6 +23,7 @@
     "jquery": "^3.7.1",
     "jquery-mask-plugin": "^1.14.16",
     "lucide-react": "^0.486.0",
+    "prop-types": "^15.8.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tailwind-merge": "^3.1.0",
