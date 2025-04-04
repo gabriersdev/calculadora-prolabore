@@ -19,10 +19,8 @@ export default class CalculadoraProlabore {
   
   calcularINSS() {
     const faixas = [
-      {limite: 1518.00, aliquota: 0.075},
-      {limite: 2527.48, aliquota: 0.09},
-      {limite: 3362.02, aliquota: 0.12},
-      {limite: 8157.41, aliquota: 0.14}
+      {limite: 1518.00, aliquota: 0.11},
+      {limite: (2 * 1518.00), aliquota: 0.11},
     ];
     
     const faixa = faixas.find(f => f.limite >= this.salario);

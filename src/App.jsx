@@ -79,13 +79,15 @@ function App() {
       alert("Preencha todos os campos!")
     } else {
       const salary = state.value.trim().replace(/[\sA-Z]*/gi, "").replace(/\./g, "").replace(/,/g, ".")
-      console.log(salary)
+
       if (isNaN(parseFloat(salary)) || salary.startsWith("e") || salary.endsWith("e")) alert("Informe o valor do pró-labore corretamente!")
       else {
         const calc = new Calculator()
         calc.setValores(parseFloat(salary), parseInt(state["count-depends"] ?? 0))
         setState((prev) => ({...prev, ["return"]: calc.calcularProlabore()}))
       }
+      
+      if (salary < 1518) alert("O pró-labore deve ser, de no mínimo de um salário mínimo, atualmente R$ 1.518,00. O resultado será calculado, mas use com cautela.")
     }
   }
   
