@@ -1,3 +1,5 @@
+import config from "../data/config.js"
+
 export default class CalculadoraProlabore {
   constructor() {
     this.salario = 0;
@@ -8,6 +10,8 @@ export default class CalculadoraProlabore {
     
     this.aliquotaINSS = 0;
     this.aliquotaRealINSS = 0;
+    this.maxINSS = config["max-inss"] ?? 0
+    
     this.aliquotaIRPF = 0;
     this.aliquotaRealIRPF = 0;
   }
@@ -27,21 +31,10 @@ export default class CalculadoraProlabore {
     if (faixa) this.aliquotaINSS = faixa.aliquota * 100;
     else if (this.salario > faixas[faixas.length - 1].limite) this.aliquotaINSS = faixas[faixas.length - 1].aliquota * 100;
     
-    let salarioRestante = this.salario;
-    let totalINSS = 0;
+    let totalINSS = this.salario * (this.aliquotaINSS / 100);
+    if (totalINSS > this.maxINSS) totalINSS = this.maxINSS;
     
-    for (let i = 0; i < faixas.length; i++) {
-      const {limite, aliquota} = faixas[i];
-      if (salarioRestante > 0) {
-        const baseCalculo = Math.min(salarioRestante, limite - (faixas[i - 1]?.limite || 0));
-        totalINSS += baseCalculo * aliquota;
-        salarioRestante -= baseCalculo;
-      } else {
-        break;
-      }
-    }
-    
-    this.aliquotaRealINSS = (totalINSS / this.salario) * 100;
+    this.aliquotaRealINSS = (totalINSS / this.salario);
     this.inss = totalINSS;
   }
   
