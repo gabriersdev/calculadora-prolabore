@@ -8,6 +8,7 @@ import {Button} from "./ui/button.js";
 import moment from "moment";
 import PropTypes from "prop-types";
 import {Theme as Context} from "./Calculator.jsx"
+import Util from "../util/Util.js";
 
 const UseFormProlaboreData = ({setState}) => {
   document.querySelector(`#CNPJ`).focus();
@@ -115,9 +116,43 @@ export default function FormProlaboreData() {
     const lenghtForValues = Object.values(state).filter(o => typeof o === "string").map(o => (o || "").trim().length)
     const existsEmptyValue = ![undefined, null].includes(lenghtForValues.find(l => l === 0))
     
+    const form = e.target.tagName === "form" ? e.target : e.target.closest("form");
+    const inputs = Array.from(form.querySelectorAll("input[required]"))
+    let mess = ""
+    let inputTargetId = ""
+    
+    inputs.forEach(input => {
+      input.setCustomValidity("")
+    });
+    
     if (existsEmptyValue) {
-      const form = e.target.tagName === "form" ? e.target : e.target.closest("form");
-      Array.from(form.querySelectorAll("input[required]")).find(i => i.value.trim().length === 0).setCustomValidity("Você precisa preencher este campo!");
+      inputs.find(i => i.value.trim().length === 0).setCustomValidity("Você precisa preencher este campo!");
+      return;
+    } else if (state.CPF.match(/\d/g).length !== 11) {
+      mess = "O CPF deve ter 11 dígitos, todos númericos!"
+      inputTargetId = "CPF"
+    } else if (state.CNPJ.match(/\d/g).length !== 14) {
+      mess = "O CNPJ deve ter 14 dígitos, todos númericos"
+      inputTargetId = "CNPJ"
+    } else if (state["document-reference"].match(/\d/g).length !== 6) {
+      mess = "A referência precisa seguir o padrão 00/0000 - dois dígitos para o mês, seguido de 4 para o ano"
+      inputTargetId = "document-reference"
+    } else if (!Util.verifyCPF(state.CPF)) {
+      mess = "O CPF informado não é válido! Gentileza verifique."
+      inputTargetId = "CPF"
+    } else if (!Util.verifyCNPJ(state.CNPJ)) {
+      mess = "O CNPJ informado não é válido! Gentileza verifique."
+      inputTargetId = "CNPJ"
+    }
+    else {
+      mess = ""
+      inputTargetId = ""
+    }
+    
+    if (mess) {
+      alert(mess)
+      const input = inputs.find(i => i.id === inputTargetId)
+      if (input) input.setCustomValidity(mess)
       return;
     }
     
@@ -150,7 +185,7 @@ export default function FormProlaboreData() {
     
     doc.text(`${enterpriseName}`, 10, 20);
     doc.text(`${state.CNPJ}`, 10, 30);
-    doc.text(`Eu, ${personName} recebi a quantia ${liquidSallary ? `de ${liquidSallary}` : 'descrita acima'} \nreferente ao serviço prestado como sócio/administrador da empresa \n${enterpriseName} em ${new Date(moment.now()).toLocaleDateString("pt-BR", {day: "numeric", month: "long", year: "numeric"})}.`, 10, 110,);
+    doc.text(`Eu, ${personName}, recebi a quantia ${liquidSallary ? `de ${liquidSallary}` : 'descrita acima'} \nreferente ao serviço prestado como sócio/administrador da empresa \n${enterpriseName} em ${new Date(moment.now()).toLocaleDateString("pt-BR", {day: "numeric", month: "long", year: "numeric"})}.`, 10, 110,);
     doc.text(`___________________________________`, 10, 140);
     doc.text(`${personName}, CPF ${state.CPF}`, 10, 150);
     
