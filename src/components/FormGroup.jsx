@@ -7,7 +7,7 @@ export default function FormGroup ({params, state, handleChange}) {
   return (
     <div className="flex gap-1 flex-col" key={id}>
       <label className="text-zinc-400" htmlFor={id}>
-        {label}
+        {label}{options.required ? (<span className={"text-red-600"}>*</span>) : ''}
       </label>
       <Input
         type={type}

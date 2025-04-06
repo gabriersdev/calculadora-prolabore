@@ -68,27 +68,39 @@ const RenderResults = ({state}) => {
 }
 
 const UseCalculator = ({setState, inputValue}) => {
-  const inputs = $('[data-mask="money"]')
+  const inputsMoney = $('[data-mask="money"]')
+  const inputNumber0 = $('[data-mask="number-0"]')
   
-  inputs.mask('#.##0,00', {
+  inputsMoney.mask('#.##0,00', {
     reverse: true,
     placeholder: 'R$ 0,00'
   });
   
-  inputs.each((i, input) => {
-    $(input).on("input", (e) => {
-      setState((prev) => ({
-        ...prev,
-        [e.target.id]: e.target.value
-      }))
+  inputNumber0.mask('#', {
+    maxLength: 1,
+    placeholder: '0'
+  })
+  
+  const inputs = [inputsMoney, inputNumber0]
+  
+  inputs.forEach(inputs => {
+    $(inputs).each((i, input) => {
+      $(input).on("input", (e) => {
+        setState((prev) => ({
+          ...prev,
+          [e.target.id]: e.target.value
+        }))
+      })
     })
   })
   
   if (inputValue.current && !inputValue.current.isFocused) inputValue.current.focus();
   
   return () => {
-    inputs.unmask();
-    inputs.off("input");
+    inputs.forEach(input => {
+      $(input).unmask();
+      $(input).off("input");
+    })
   }
 }
 
@@ -100,7 +112,7 @@ const FormCalulator = ({formFields, state, handleChange, handleSubmit}) => {
           formFields.filter(f => f.mask).map(({id, type, label, placeholder, mask, options}) => (
             <div className="flex gap-1 flex-col" key={`${id}`}>
               <label className="text-zinc-400" htmlFor={`${id}`}>
-                {label}
+                {label}{options.required ? (<span className={"text-red-600"}>*</span>) : ''}
               </label>
               <Input
                 type={`${type}`}
@@ -181,7 +193,9 @@ const Calculator = () => {
       type: "number",
       id: "count-depends",
       placeholder: "0",
-      label: "Número de dependentes"
+      label: "Número de dependentes",
+      mask: "number-0",
+      options: {maxLength: 1, pattern: "[0-9]{1}", required: true},
     },
   ], []);
   
