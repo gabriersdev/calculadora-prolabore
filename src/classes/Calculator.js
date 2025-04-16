@@ -28,13 +28,16 @@ export default class CalculadoraProlabore {
     ];
     
     const faixa = faixas.find(f => f.limite >= this.salario);
-    if (faixa) this.aliquotaINSS = faixa.aliquota * 100;
-    else if (this.salario > faixas[faixas.length - 1].limite) this.aliquotaINSS = faixas[faixas.length - 1].aliquota * 100;
+    if (faixa) this.aliquotaINSS = faixa.aliquota;
+    else if (this.salario > faixas[faixas.length - 1].limite) this.aliquotaINSS = faixas[faixas.length - 1].aliquota;
     
-    let totalINSS = this.salario * (this.aliquotaINSS / 100);
+    let totalINSS = this.salario * this.aliquotaINSS;
     if (totalINSS > this.maxINSS) totalINSS = this.maxINSS;
     
-    this.aliquotaRealINSS = (totalINSS / this.salario);
+    // Multiplica a propriedade por 100 para que exiba depois o % correto
+    this.aliquotaINSS *= 100;
+    
+    this.aliquotaRealINSS = (totalINSS / this.salario) * 100;
     this.inss = totalINSS;
   }
   
