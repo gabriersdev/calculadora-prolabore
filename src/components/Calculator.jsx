@@ -11,6 +11,7 @@ import {Button} from "./ui/button.js";
 
 import {Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow} from "./ui/table.js";
 import PrintProlabore from "./PrintProlabore.jsx";
+import AlertDialogC from "./ui/alert-dialog.jsx";
 
 const Theme = createContext({});
 
@@ -21,7 +22,7 @@ const RenderResults = ({state}) => {
   
   const handleCopy = useCallback((text) => {
     navigator.clipboard.writeText(text.replace(/[(R$)\s]/g, "")).then(() => {
-      alert("Copiado!")
+    // feedback sobre copia de conteudo é aplicado mesmo se não der certo a cópia
     }).catch((e) => {
       console.log(e)
       alert("Erro!" + " " + e.message)
@@ -33,10 +34,10 @@ const RenderResults = ({state}) => {
       <h2 className={"text-zinc-400"}>Resultado</h2>
       <Table>
         <TableCaption>
-          <span className={"text-zinc-400"}>Cálculo do pró-labore.</span>
+          <span className={"text-zinc-400 text-[16px]"}>Cálculo do pró-labore.</span>
         </TableCaption>
         <TableHeader>
-          <TableRow className={"border-b-accent-foreground hover:bg-inherit"}>
+          <TableRow className={"border-b-accent-foreground hover:bg-inherit text-[16px]"}>
             <TableHead>#</TableHead>
             <TableHead>Alíquota</TableHead>
             <TableHead>Alíquota real</TableHead>
@@ -53,7 +54,9 @@ const RenderResults = ({state}) => {
                     <TableCell className={`${formatCondition(index)}`}>{item[2]}</TableCell>
                     <TableCell className={`${formatCondition(index)} text-right`} onClick={() => {
                       handleCopy(item[3])
-                    }}>{item[3]}</TableCell>
+                    }}>
+                      <AlertDialogC title={"Copiado!"} description={`${typeof item[3] === "string" ? "Texto" : "Conteúdo"} copiado com sucesso.`}>{item[3]}</AlertDialogC>
+                    </TableCell>
                   </TableRow>
                 )
               }

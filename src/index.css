@@ -73,7 +73,7 @@
   font-family: 'Inter Tight', 'Arial', sans-serif;
 }
 
-body {
+body, .text {
   font-size: 16px;
 }
 

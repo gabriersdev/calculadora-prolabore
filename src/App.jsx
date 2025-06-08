@@ -2,8 +2,6 @@ import 'jquery-mask-plugin/dist/jquery.mask.min';
 import {Calculator} from "./components/Calculator.jsx";
 
 function App() {
-
-  
   return (
     <main
       className="flex flex-col items-center justify-center min-h-svh bg-zinc-950 [&_*]:tracking-[0.5px]">
